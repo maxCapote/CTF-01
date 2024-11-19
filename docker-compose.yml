@@ -1,0 +1,26 @@
+services:
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=${DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASS}
+    volumes:
+      - mongo:/data/db
+  notekeeper:
+    container_name: notekeeper
+    image: notekeeper:1.0.0
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.data.mongodb.uri" : "mongodb://${DB_USER}:${DB_PASS}@mongo:27017/${DB_NAME}?authSource=admin"
+        }'
+    depends_on:
+      - mongo
+volumes:
+  mongo: {}
