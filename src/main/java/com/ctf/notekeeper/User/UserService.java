@@ -1,7 +1,7 @@
 package com.ctf.notekeeper.User;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.util.regex.Pattern;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ctf.notekeeper.Role.RoleEnum;
+//import com.ctf.notekeeper.Role.RoleEnum;
 import com.ctf.notekeeper.Role.RoleUtils;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public User registerUser(User user) {
+    /*public User registerUser(User user) {
         validateCreds(user.getUsername(), user.getPassword());
         if (findUser(user.getUsername()) == null) {
             List<RoleEnum> roles = new ArrayList<>();
@@ -38,8 +38,9 @@ public class UserService implements UserDetailsService {
         } else {
             throw new IllegalArgumentException("Invalid username or password");
         }
-    }
+    }*/
 
+    // I guess we'll allow password change since that seems useful sometimes
     public User changePassword(User user) {
         validateCreds(user.getUsername(), user.getPassword());
 
@@ -48,13 +49,18 @@ public class UserService implements UserDetailsService {
         }
 
         User targetUser = findUser(user.getUsername());
+        targetUser.setId(user.getId() != null ? user.getId() : targetUser.getId());
+        targetUser.setUsername(user.getUsername());
         targetUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        targetUser.setRoles(user.getRoles() != null ? user.getRoles() : targetUser.getRoles());
         return userRepository.save(targetUser);
     }
 
-    private synchronized Integer generateUserId() {
-        return userRepository.findAll().size() + 1;
-    }
+    //private synchronized Integer generateUserId() {
+        //return userRepository.findAll().size() + 1;
+    //}
+
+    // the rest of this is a bunch of utility
 
     private String getCurrentUser() {
         return SecurityContextHolder.getContext().getAuthentication().getName();

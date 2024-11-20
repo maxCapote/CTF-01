@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// this is class is useful for error handling
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

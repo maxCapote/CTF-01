@@ -3,7 +3,6 @@ package com.ctf.notekeeper.Auth;
 import java.util.regex.Pattern;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -22,11 +21,12 @@ public class LoginRequestService {
     private final TokenService tokenService;
 
     public String getToken(String username, String password) {
+        // make sure those creds are valid before swiping a token
         validateCreds(username, password);
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             return tokenService.generateToken(authentication);
-        } catch (BadCredentialsException e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid username or password");
         }
     }

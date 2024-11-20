@@ -21,10 +21,13 @@ import java.util.List;
 public class NoteController {
     private final NoteService noteService;
 
+    // throwing this in for a quick sanity check on start
     @GetMapping("/test")
     public CustomResponse helloWorld() {
         return CustomResponseFactory.createResponse("message", "We're up");
     }
+
+    // this other stuff is the usual CRUDL
 
     @PostMapping("/record")
     public Note recordNote(@RequestBody Note note) {

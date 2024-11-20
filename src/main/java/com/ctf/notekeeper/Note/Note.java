@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Document(collection = "notes")
 public class Note {
+    // nothing out of the ordinary
     @Id
     private Integer id;
     private String description;

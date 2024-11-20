@@ -2,6 +2,7 @@ package com.ctf.notekeeper.Misc;
 
 import java.util.Map;
 
+// good ol' factory pattern for my devs out there
 public class CustomResponseFactory {
     public static CustomResponse createResponse(String key, Object value) {
         CustomResponse response = new CustomResponse();

@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Document(collection = "users")
 public class User {
+    // usual stuff that you'd expect to see on a user
     @Id
     private Integer id;
     private String username;

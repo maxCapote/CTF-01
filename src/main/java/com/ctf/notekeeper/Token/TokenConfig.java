@@ -22,6 +22,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration
 public class TokenConfig {
+    // assymmetric encryption here just protects us a little more than symmetric
     @Bean
     public KeyPair keyPair() {
         try {

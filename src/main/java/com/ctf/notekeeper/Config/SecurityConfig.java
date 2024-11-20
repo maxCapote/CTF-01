@@ -29,12 +29,15 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();
     }
 
+    // *slaps hands together*
+    // *starts rubbing hands together*
+    // this is where the magic happens
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/v1/notekeeper/test", "/user/register", "/login").permitAll()
+                .requestMatchers("/v1/notekeeper/test", "/login").permitAll() // leaving out "/user/register",
                 .requestMatchers("/user/flag").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()

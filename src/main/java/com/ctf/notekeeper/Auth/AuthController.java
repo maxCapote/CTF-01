@@ -14,6 +14,8 @@ import lombok.AllArgsConstructor;
 public class AuthController {
     private final LoginRequestService loginRequestService;
 
+    // login with this controller
+    // I've been using this for testing - dev:icanwritebetterpasswordvalidation
     @PostMapping("/login")
     public CustomResponse token(@RequestBody LoginRequest loginRequest) {
         return CustomResponseFactory.createResponse("jwt", loginRequestService.getToken(loginRequest.username(), loginRequest.password()));

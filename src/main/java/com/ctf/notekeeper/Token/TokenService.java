@@ -39,6 +39,8 @@ public class TokenService {
     private final JwtDecoder decoder;
     private final Map<String, Jwt> tokenStore = new HashMap<>();
 
+    // we'll construct the jwt here
+    // this should be okay
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
         String roles = authentication.getAuthorities().stream()
@@ -62,6 +64,7 @@ public class TokenService {
         return new Converter<Jwt, AbstractAuthenticationToken>() {
             @Override
             public AbstractAuthenticationToken convert(Jwt jwt) {
+                // plenty of validation to thwart those darn hackers
                 validateJti(jwt);
                 validateSubject(jwt);
                 validateIssuer(jwt);

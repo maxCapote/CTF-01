@@ -16,6 +16,7 @@ public class TokenCleanupService {
     private final TokenService tokenService;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+    // since our jwt has a jti, we want to clean out expired tokens from the token storage
     @PostConstruct
     public void startScheduler() {
         scheduler.scheduleAtFixedRate(() -> tokenService.removeExpiredTokens(), 0, 15, TimeUnit.MINUTES);
