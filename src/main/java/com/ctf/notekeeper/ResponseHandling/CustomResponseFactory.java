@@ -1,4 +1,4 @@
-package com.ctf.notekeeper.Misc;
+package com.ctf.notekeeper.ResponseHandling;
 
 import java.util.Map;
 

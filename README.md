@@ -12,7 +12,7 @@ This is the first CTF challenge I'm providing in this style. It should be a simp
 * CORS
 * logging and monitoring
 * password policy
-* the contents of the .env and DataLoader files
+* the contents of the .env and SampleData files
 ## Quick Guide
 * set WORKDIR in the .env file
 * fire up

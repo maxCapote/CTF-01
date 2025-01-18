@@ -3,9 +3,8 @@ package com.ctf.notekeeper.Token;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -36,27 +34,31 @@ public class TokenService {
     private static final String CLAIM_JTI = "jti";
 
     private final JwtEncoder encoder;
-    private final JwtDecoder decoder;
-    private final Map<String, Jwt> tokenStore = new HashMap<>();
+    private final TokenRepository tokenRepository;
 
     // we'll construct the jwt here
     // this should be okay
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
+        Instant expiry = now.plus(15, ChronoUnit.MINUTES);
+        String subject = authentication.getName();
         String roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
         String jti = UUID.randomUUID().toString();
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer(EXPECTED_ISSUER)
             .issuedAt(now)
-            .expiresAt(now.plus(15, ChronoUnit.MINUTES))
-            .subject(authentication.getName())
+            .expiresAt(expiry)
+            .subject(subject)
             .claim(CLAIM_ROLES, roles)
             .claim(CLAIM_JTI, jti)
             .build();
+
         String token = this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-        tokenStore.put(jti, this.decoder.decode(token));
+        Token tokenEntry = new Token(jti, EXPECTED_ISSUER, now, expiry, subject, roles);
+        tokenRepository.save(tokenEntry);
         return token;
     }
 
@@ -64,11 +66,7 @@ public class TokenService {
         return new Converter<Jwt, AbstractAuthenticationToken>() {
             @Override
             public AbstractAuthenticationToken convert(Jwt jwt) {
-                // plenty of validation to thwart those darn hackers
-                validateJti(jwt);
-                validateSubject(jwt);
-                validateIssuer(jwt);
-                validateRoles(jwt);                
+                validateJwt(jwt);
 
                 JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
                 grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
@@ -81,16 +79,25 @@ public class TokenService {
         };
     }
 
+    private void validateJwt(Jwt jwt) {
+        validateJti(jwt);
+        validateSubject(jwt);
+        validateIssuer(jwt);
+        validateRoles(jwt);
+    }
+
     private void validateJti(Jwt jwt) {
         String jti = jwt.getClaimAsString(CLAIM_JTI);
-        if (!tokenStore.containsKey(jti)) {
+        if (!tokenRepository.existsById(jti)) {
             throw new AccessDeniedException("Invalid JWT");
         }
     }
 
     private void validateSubject(Jwt jwt) {
         String jti = jwt.getClaimAsString(CLAIM_JTI);
-        if (!tokenStore.get(jti).getSubject().equals(jwt.getSubject())) {
+        Token token = tokenRepository.findById(jti)
+                .orElseThrow(() -> new AccessDeniedException("Invalid JWT"));
+        if (!token.getSubject().equals(jwt.getSubject())) {
             throw new AccessDeniedException("Invalid JWT");
         }
     }
@@ -115,20 +122,14 @@ public class TokenService {
     }
 
     private boolean isValidRole(String role) {
-        try {
-            RoleEnum.valueOf(role);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        return EnumSet.allOf(RoleEnum.class).stream()
+                .anyMatch(e -> e.name().equals(role));
     }
 
     public void removeExpiredTokens() {
         Instant now = Instant.now();
-        tokenStore.entrySet().removeIf(entry -> {
-            Jwt jwt = entry.getValue();
-            return jwt.getExpiresAt() != null &&
-                   jwt.getExpiresAt().isBefore(now);
-        });
-    }    
+        tokenRepository.findAll().stream()
+                .filter(token -> token.getExpiresAt() != null && token.getExpiresAt().isBefore(now))
+                .forEach(tokenRepository::delete);
+    }
 }

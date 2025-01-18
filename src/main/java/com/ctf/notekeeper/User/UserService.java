@@ -28,7 +28,7 @@ public class UserService implements UserDetailsService {
 
     /*public User registerUser(User user) {
         validateCreds(user.getUsername(), user.getPassword());
-        if (findUser(user.getUsername()) == null) {
+        if (userRepository.findByUsername(user.getUsername()) == null) {
             List<RoleEnum> roles = new ArrayList<>();
             roles.add(RoleEnum.USER);
             user.setId(generateUserId());
@@ -48,12 +48,19 @@ public class UserService implements UserDetailsService {
             throw new AccessDeniedException("You do not have permission to access this resource");
         }
 
-        User targetUser = findUser(user.getUsername());
+        User targetUser = userRepository.findByUsername(user.getUsername());
         targetUser.setId(user.getId() != null ? user.getId() : targetUser.getId());
         targetUser.setUsername(user.getUsername());
         targetUser.setPassword(passwordEncoder.encode(user.getPassword()));
         targetUser.setRoles(user.getRoles() != null ? user.getRoles() : targetUser.getRoles());
         return userRepository.save(targetUser);
+    }
+
+    private void validateCreds(String username, String password) {
+        if (username == null || password == null ||
+            !(USER_REGEX.matcher(username).matches() && PASS_REGEX.matcher(password).matches())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
     }
 
     //private synchronized Integer generateUserId() {
@@ -64,18 +71,7 @@ public class UserService implements UserDetailsService {
 
     private String getCurrentUser() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
-    }
-
-    private User findUser(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    private void validateCreds(String username, String password) {
-        if (username == null || password == null ||
-            !(USER_REGEX.matcher(username).matches() && PASS_REGEX.matcher(password).matches())) {
-            throw new IllegalArgumentException("Invalid username or password");
-        }
-    }
+    } 
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

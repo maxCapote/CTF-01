@@ -22,30 +22,45 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration
 public class TokenConfig {
+    private final Integer KEY_SIZE = 2048;
+
     // assymmetric encryption here just protects us a little more than symmetric
     @Bean
     public KeyPair keyPair() {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
+            keyPairGenerator.initialize(KEY_SIZE);
             return keyPairGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating RSA key pair", e);
+            throw new KeyPairGenerationException("Error generating RSA key pair", e);
         }
     }
 
     @Bean
     public JwtEncoder jwtEncoder(KeyPair keyPair) {
-        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey)keyPair.getPrivate();
-        JWK jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
+        JWK jwk = new RSAKey.Builder(getPublicKey(keyPair))
+                .privateKey(getPrivateKey(keyPair))
+                .build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
 
     @Bean
     public JwtDecoder jwtDecoder(KeyPair keyPair) {
-        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
-        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+        return NimbusJwtDecoder.withPublicKey(getPublicKey(keyPair)).build();
+    }
+
+    private RSAPublicKey getPublicKey(KeyPair keyPair) {
+        return (RSAPublicKey) keyPair.getPublic();
+    }
+
+    private RSAPrivateKey getPrivateKey(KeyPair keyPair) {
+        return (RSAPrivateKey) keyPair.getPrivate();
+    }
+
+    private static class KeyPairGenerationException extends RuntimeException {
+        public KeyPairGenerationException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

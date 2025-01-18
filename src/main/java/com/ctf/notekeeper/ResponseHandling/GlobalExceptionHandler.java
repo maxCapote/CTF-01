@@ -1,8 +1,6 @@
-package com.ctf.notekeeper.Misc;
+package com.ctf.notekeeper.ResponseHandling;
 
 import java.util.NoSuchElementException;
-
-import javax.naming.ServiceUnavailableException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +23,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<CustomResponse> handleNoSuchElementException(NoSuchElementException e) {
         return createErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(ServiceUnavailableException.class)
-    public ResponseEntity<CustomResponse> handleServiceUnavailableException(ServiceUnavailableException e) {
-        return createErrorResponse(e.getMessage(), HttpStatus.TOO_MANY_REQUESTS);
     }
 
     private ResponseEntity<CustomResponse> createErrorResponse(String message, HttpStatus status) {

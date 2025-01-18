@@ -8,12 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ctf.notekeeper.Misc.CustomResponse;
-import com.ctf.notekeeper.Misc.CustomResponseFactory;
+import com.ctf.notekeeper.ResponseHandling.CustomResponse;
+import com.ctf.notekeeper.ResponseHandling.CustomResponseFactory;
 
 import lombok.AllArgsConstructor;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/notekeeper")
@@ -30,18 +28,18 @@ public class NoteController {
     // this other stuff is the usual CRUDL
 
     @PostMapping("/record")
-    public Note recordNote(@RequestBody Note note) {
-        return noteService.recordNote(note);
+    public CustomResponse recordNote(@RequestBody Note note) {
+        return CustomResponseFactory.createResponse("note", noteService.recordNote(note));
     }
 
     @GetMapping("/{id}")
-    public Note getNote(@PathVariable Integer id) {
-        return noteService.getNote(id);
+    public CustomResponse getNote(@PathVariable Integer id) {
+        return CustomResponseFactory.createResponse("note", noteService.getNote(id));
     }
 
     @PostMapping("/update/{id}")
-    public Note updateNote(@PathVariable Integer id, @RequestBody Note note) {
-        return noteService.updateNote(id, note);
+    public CustomResponse updateNote(@PathVariable Integer id, @RequestBody Note note) {
+        return CustomResponseFactory.createResponse("note", noteService.updateNote(id, note));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -50,7 +48,7 @@ public class NoteController {
     }
 
     @GetMapping("")
-    public List<Note> listNotes() {
-        return noteService.listNotes();
+    public CustomResponse listNotes() {
+        return CustomResponseFactory.createResponse("notes", noteService.listNotes());
     }
 }

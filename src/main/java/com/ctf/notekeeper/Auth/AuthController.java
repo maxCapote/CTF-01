@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ctf.notekeeper.Misc.CustomResponse;
-import com.ctf.notekeeper.Misc.CustomResponseFactory;
+import com.ctf.notekeeper.ResponseHandling.CustomResponse;
+import com.ctf.notekeeper.ResponseHandling.CustomResponseFactory;
 
 import lombok.AllArgsConstructor;
 

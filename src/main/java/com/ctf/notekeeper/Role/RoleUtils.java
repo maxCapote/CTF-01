@@ -8,6 +8,6 @@ import java.util.stream.Collectors;
 public class RoleUtils {
     public static List<GrantedAuthority> getAuthorities(List<RoleEnum> roles) {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.name()))
-                    .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 }

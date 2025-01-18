@@ -9,31 +9,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ctf.notekeeper.Misc.CustomResponse;
-import com.ctf.notekeeper.Misc.CustomResponseFactory;
+import com.ctf.notekeeper.ResponseHandling.CustomResponse;
+import com.ctf.notekeeper.ResponseHandling.CustomResponseFactory;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/user")
+@AllArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final Dotenv dotenv;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-        this.dotenv = Dotenv.load();
-    }
 
     // no need to allow registration at the moment
     //@PostMapping("/register")
-    //public User registUser(@RequestBody User user) {
-        //return userService.registerUser(user);
+    //public CustomResponse registUser(@RequestBody User user) {
+        //return CustomResponseFactory.createResponse("user", userService.registerUser(user));
     //}
 
     @PostMapping("/change-password")
-    public User changePassword(@RequestBody User user) {
-        return userService.changePassword(user);
+    public CustomResponse changePassword(@RequestBody User user) {
+        return CustomResponseFactory.createResponse("message",  userService.changePassword(user));
     }
 
     // I don't even know whoami any more
@@ -46,6 +41,6 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/flag")
     public CustomResponse getFlag() {
-        return CustomResponseFactory.createResponse("flag", dotenv.get("FLAG"));
+        return CustomResponseFactory.createResponse("flag", "{Zm9vYmFy}");
     }
 }

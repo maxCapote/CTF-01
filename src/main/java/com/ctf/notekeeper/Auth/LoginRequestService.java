@@ -23,17 +23,21 @@ public class LoginRequestService {
     public String getToken(String username, String password) {
         // make sure those creds are valid before swiping a token
         validateCreds(username, password);
-        try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            return tokenService.generateToken(authentication);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid username or password");
-        }
+        Authentication authentication = authenticate(username, password);
+        return tokenService.generateToken(authentication);
     }
 
     private void validateCreds(String username, String password) {
         if (username == null || password == null ||
             !(USER_REGEX.matcher(username).matches() && PASS_REGEX.matcher(password).matches())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+    }
+
+    private Authentication authenticate(String username, String password) {
+        try {
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid username or password");
         }
     }

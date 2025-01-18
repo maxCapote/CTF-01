@@ -1,4 +1,4 @@
-package com.ctf.notekeeper.Misc;
+package com.ctf.notekeeper.ResponseHandling;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
