@@ -1,6 +1,6 @@
 # Simple REST API CTF
 ## Description
-This is the first CTF challenge I'm providing in this style. It should be a simple one. Review the code, exploit the flaws, and read the flag from the protected mapping. There are a couple paths to victory, but do disregard the data that is plainly available in the .env and DataLoader files.
+This is the first CTF challenge I'm providing in this style. It should be a simple one. Review the code, exploit the flaws, and read the flag from the protected mapping. There are a couple paths to victory, but do disregard the data that is plainly available in the .env and SampleData files.
 ## Requirements
 * docker desktop
 * java 17
